@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/qss">
+        <file>app.qss</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file>images/background.jpg</file>
+        <file>images/selected.png</file>
+        <file>images/unselected.png</file>
+        <file>images/downarrow.png</file>
+    </qresource>
+    <qresource prefix="/language">
+        <file>cn.qm</file>
+    </qresource>
+    <qresource prefix="/xml">
+        <file>command.xml</file>
+    </qresource>
+</RCC>

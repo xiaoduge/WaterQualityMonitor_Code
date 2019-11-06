@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Command>
+	<Confirm>C00301000000</Confirm>
+	<Save>C00306000000</Save>
+
+	<ReadData id="0">C10200030006</ReadData>
+	<ReadConst id="0">C1028E8F0002</ReadConst>
+	<ReadTempConst id="0">C1028C8D0002</ReadTempConst>
+	<WriteConst id="0">C1038E8F</WriteConst>
+	<WriteTempConst id="0">C1038C8D</WriteTempConst>
+
+	<ReadData id="1">C202000E0006</ReadData>
+	<ReadConst id="1">C2029E9F0002</ReadConst>
+	<ReadTempConst id="1">C2029C9D0002</ReadTempConst>
+	<WriteConst id="1">C2039E9F</WriteConst>
+	<WriteTempConst id="1">C2039C9D</WriteTempConst>
+
+	<ReadData id="2">C30200190006</ReadData>
+	<ReadConst id="2">C302AEAF0002</ReadConst>
+	<ReadTempConst id="2">C302ACAD0002</ReadTempConst>
+	<WriteConst id="2">C303AEAF</WriteConst>
+	<WriteTempConst id="2">C303ACAD</WriteTempConst>
+
+	<ReadData id="3">C40200210006</ReadData>
+	<ReadConst id="3">C402BEBF0002</ReadConst>
+	<ReadTempConst id="3">C402BCBD0002</ReadTempConst>
+	<WriteConst id="3">C403BEBF</WriteConst>
+	<WriteTempConst id="3">C403BCBD</WriteTempConst>
+
+	<ReadData id="4">C502002C0006</ReadData>
+	<ReadConst id="4">C502CECF0002</ReadConst>
+	<ReadTempConst id="4">C502CCCD0002</ReadTempConst>
+	<WriteConst id="4">C503CECF</WriteConst>
+	<WriteTempConst id="4">C503CCCD</WriteTempConst>
+</Command>
