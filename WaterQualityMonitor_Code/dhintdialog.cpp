@@ -4,6 +4,7 @@
 #include <QTimer>
 #include <QMutexLocker>
 #include <QDebug>
+#include "config.h"
 
 DHintDialog *DHintDialog::instance = nullptr;
 

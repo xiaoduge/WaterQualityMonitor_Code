@@ -39,7 +39,8 @@ SOURCES += \
     dhexcmd.cpp \
     dhintdialog.cpp \
     dwarningdialog.cpp \
-    ddialogtitle.cpp
+    ddialogtitle.cpp \
+    dlogger.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -47,7 +48,9 @@ HEADERS += \
     dhexcmd.h \
     dhintdialog.h \
     dwarningdialog.h \
-    ddialogtitle.h
+    ddialogtitle.h \
+    dlogger.h \
+    config.h
 
 FORMS += \
         mainwindow.ui

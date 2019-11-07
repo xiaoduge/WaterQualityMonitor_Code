@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "dhexcmd.h"
+#include "dlogger.h"
 
 namespace Ui {
 class MainWindow;
@@ -149,6 +150,7 @@ private:
 
     int m_iMask;
     QString m_strUnit[Unit_Num];
+
 };
 
 #endif // MAINWINDOW_H

@@ -1,5 +1,7 @@
 #include "dhexcmd.h"
 #include "dcommandgenerator.h"
+#include "config.h"
+#include "dlogger.h"
 #include <QFile>
 #include <QXmlStreamReader>
 #include <QMessageBox>
@@ -46,6 +48,7 @@ void DHexCmd::init()
         QMessageBox::critical(nullptr,
                               QStringLiteral("Error"),
                               QStringLiteral("Open XML File failed!"));
+        gLogger.log("Failed to get command from xml file", DLogger::Log_Error);
     }
 
 }
@@ -55,6 +58,7 @@ bool DHexCmd::initFromXml(const QString &fileName)
     QFile file(fileName);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
+        gLogger.log("Failed to open Xml file");
         return false;
     }
 
@@ -68,9 +72,16 @@ bool DHexCmd::initFromXml(const QString &fileName)
             XmlFunPtr funcPtr = m_funcMap.value(xmlReader.name().toString(), &DHexCmd::initInvalidKey);
             (this->*funcPtr)(xmlReader);
         }
-    }
 
+    }
+    if(xmlReader.hasError())
+    {
+        gLogger.log("Xml has Error", DLogger::Log_Error);
+        file.close();
+        return false;
+    }
     file.close();
+    gLogger.log("Successfully get commands from xml file");
     return true;
 }
 
