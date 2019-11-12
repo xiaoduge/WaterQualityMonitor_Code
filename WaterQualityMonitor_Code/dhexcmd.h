@@ -30,7 +30,7 @@ public:
     const QByteArray confirmCommand() const;
     const QByteArray saveCommand() const;
 
-    const void displayCommand() const;
+    void displayCommand() const;
 private:
     void init();
     bool initFromXml(const QString &fileName);

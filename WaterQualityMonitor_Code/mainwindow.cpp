@@ -27,9 +27,9 @@ DLogger gLogger("Log");
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    m_iMask(0),
+    ui(new Ui::MainWindow),
     m_readCount{0, 0, 0, 0, 0},
-    ui(new Ui::MainWindow)
+    m_iMask(0)
 {
     ui->setupUi(this);
     init();
@@ -256,7 +256,7 @@ void MainWindow::writeParameter(DHexCmd::CommandType cmdType)
         }
         break;
     case DHexCmd::WriteTempConst:
-        iConst = m_pTempConstLineEdit->text().toUShort();
+        iConst = m_pTempConstLineEdit->text().toShort();
         break;
     default:
         break;
@@ -291,7 +291,7 @@ void MainWindow::transmit(const QByteArray &cmd, DHexCmd::CommandType CmdType)
 {
     m_serialPort->write(cmd);
 
-    sleep(100);
+    sleep(150);
 
     QByteArray readBuf = m_serialPort->readAll();
 
@@ -301,7 +301,7 @@ void MainWindow::transmit(const QByteArray &cmd, DHexCmd::CommandType CmdType)
 void MainWindow::init()
 {
     this->setWindowTitle(tr("WaterQualityMonitor"));
-    m_workTimer = new QTimer(this);
+     m_workTimer = new QTimer(this);
     connect(m_workTimer, &QTimer::timeout, this, &MainWindow::sendCommand);
 
     m_serialPort = new QSerialPort(this);
@@ -346,8 +346,9 @@ void MainWindow::createWidget()
     m_pConstLineEdit = new QLineEdit;
     m_pConstLineEdit->setValidator(validator);
 
+    QValidator *tempValidator = new QIntValidator(-32758, 32767, this);
     m_pTempConstLineEdit = new QLineEdit;
-    m_pTempConstLineEdit->setValidator(validator);
+    m_pTempConstLineEdit->setValidator(tempValidator);
 
     m_pReadConstBtn = new QPushButton;
     m_pWriteConstBtn = new QPushButton;
@@ -769,7 +770,7 @@ void MainWindow::analysisReadData(int ch, QByteArray &bytes)
 void MainWindow::analysisReadConst(int ch, QByteArray &bytes, DHexCmd::CommandType CmdType)
 {
     Q_UNUSED(ch);
-    int constValue = (bytes[3]&0xFF)*256 + (bytes[4]&0xFF);
+    qint16 constValue = (bytes[3]&0xFF)*256 + (bytes[4]&0xFF);
     switch (CmdType)
     {
     case DHexCmd::ReadConst:

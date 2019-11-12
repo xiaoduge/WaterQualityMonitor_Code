@@ -1,4 +1,5 @@
 #include "dlogger.h"
+#include <cstring>
 
 std::mutex mt;
 DLogger::DLogger(const std::string &dir)

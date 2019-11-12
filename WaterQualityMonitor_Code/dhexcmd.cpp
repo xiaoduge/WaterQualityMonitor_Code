@@ -27,7 +27,7 @@ const QByteArray DHexCmd::saveCommand() const
     return m_saveCmd;
 }
 
-const void DHexCmd::displayCommand() const
+void DHexCmd::displayCommand() const
 {
     for(int i = 0; i < CommandTypeNum; i++)
     {
