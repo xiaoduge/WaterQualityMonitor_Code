@@ -20,7 +20,7 @@ class DHexCmd : public QObject
         WriteTempConst,
         CommandTypeNum
     };
-
+    //函数成员指针
     using XmlFunPtr = void (DHexCmd::*)(QXmlStreamReader &xmlReader);
 
 public:

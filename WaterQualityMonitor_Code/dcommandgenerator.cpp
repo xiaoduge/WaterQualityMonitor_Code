@@ -1,5 +1,19 @@
+/****************************************************************************
+**
+** @Author    dcj
+** @DateTime  2019-11-19
+** @version   v0.0.1
+** @brief     Provides functions to convert a string format command to a valid Hex format command
+**
+****************************************************************************/
+
 #include "dcommandgenerator.h"
 
+/**
+ * 计算Hex命令的CRC-16/IBM校验码
+ * @param  buf [Hex格式的命令]
+ * @return     [校验码]
+ */
 unsigned short calcrc16(const QByteArray &buf)
 {
     int len = buf.length();
@@ -44,7 +58,7 @@ char DCommandGenerator::convertHexChar(char ch)
     }
     else if((ch >= 'a') && (ch <= 'f'))
     {
-        return ch - 'a' + 10;
+        return ch - 'a' + 10;   //16进制中 a 等于 10，因此 +10
     }
     else if((ch >= 'A') && (ch <= 'F'))
     {
@@ -52,10 +66,14 @@ char DCommandGenerator::convertHexChar(char ch)
     }
     else
     {
-        return ch - ch;
+        return ch - ch;  //不是表示16进制的字符，返回ch-ch
     }
 }
 
+/**
+ * 将QString命令转换为Hex命令
+ * @param str [QString格式的命令]
+ */
 void DCommandGenerator::stringToHex(const QString &str)
 {
     char lstr, hstr;

@@ -17,7 +17,6 @@ public:
 private:
     char convertHexChar(char ch);
     void stringToHex(const QString &str);
-//    void doCalcrc16();
 
 private:
     QByteArray m_hexCommand;

@@ -2,6 +2,10 @@
 #include <cstring>
 
 std::mutex mt;
+
+/**
+ * 为日志文件提供一个目录，不提供目录则表示当前工作目录
+ */
 DLogger::DLogger(const std::string &dir)
 {
     char buf[64];
@@ -21,6 +25,11 @@ DLogger::DLogger(const std::string &dir)
 
 }
 
+/**
+ * 记录日志
+ * @param msg   [需要记录的日志信息]
+ * @param level [日志信息的类型]
+ */
 void DLogger::log(const char* msg, LogLevel level)
 {
     mt.lock();

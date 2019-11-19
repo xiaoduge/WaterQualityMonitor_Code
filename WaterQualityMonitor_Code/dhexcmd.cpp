@@ -90,6 +90,9 @@ void DHexCmd::initCommandMap(DHexCmd::CommandType type, int iKey, const QByteArr
     m_commandMap[type].insert(iKey, command);
 }
 
+/**
+ * 初始化XML元素与函数成员指针的QMap，建立XML元素名与成员函数指针的映射
+ */
 void DHexCmd::initFunMap()
 {
     m_funcMap.insert("ReadData", &DHexCmd::initReadCmd);
@@ -153,6 +156,10 @@ void DHexCmd::initSaveCmd(QXmlStreamReader &xmlReader)
     m_saveCmd = cmd.hexCommand();
 }
 
+/**
+ * 为无效的XML元素名，提供一个空函数作为映射
+ * @param xmlReader [description]
+ */
 void DHexCmd::initInvalidKey(QXmlStreamReader &xmlReader)
 {
     Q_UNUSED(xmlReader);
