@@ -32,6 +32,13 @@ QFrame QLabel
 	font-size:16px;
 }
 
+QDialog QLabel
+{
+    color: blue;
+    font-family:"Arial";
+    font-size:12px;
+}
+
 QCheckBox
 {
 	color:white;
@@ -39,6 +46,11 @@ QCheckBox
     font-size:12px;
 	height:24px;
     border-radius:2px;
+}
+
+QDialog QCheckBox
+{
+    color:blue;
 }
 
 QCheckBox::indicator

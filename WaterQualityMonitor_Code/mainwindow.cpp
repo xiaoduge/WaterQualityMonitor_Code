@@ -3,6 +3,8 @@
 #include "dcommandgenerator.h"
 #include "dhintdialog.h"
 #include "dwarningdialog.h"
+#include "dsqldialog.h"
+#include "dsqlworker.h"
 #include <QDebug>
 #include "dhexcmd.h"
 #include <QSerialPort>
@@ -22,8 +24,41 @@
 #include <QLineEdit>
 #include "dlogger.h"
 #include "config.h"
+#include <QSettings>
+#include <QAction>
 
 DLogger gLogger("Log");
+GlobalConfiguration gConfig;
+
+void MainRetriveConfigParam()
+{
+    QSettings *config = new QSettings(QStringLiteral("config.ini"), QSettings::IniFormat);
+
+    QString strV = "/OpenSqlDataLogger/";
+    gConfig.openDataLogger = config->value(strV, false).toBool();
+
+    if (config)
+    {
+        config->deleteLater();
+        config = Q_NULLPTR;
+    }
+    gLogger.log("Retrive config param");
+}
+
+void MainSaveConfigParam()
+{
+    QSettings *config = new QSettings(QStringLiteral("config.ini"), QSettings::IniFormat);
+
+    QString strV = "/OpenSqlDataLogger/";
+    config->setValue(strV, gConfig.openDataLogger);
+
+    if (config)
+    {
+        config->deleteLater();
+        config = Q_NULLPTR;
+    }
+    gLogger.log("Save config param");
+}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -38,6 +73,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    if(m_sqlWorkerThread.isRunning())
+    {
+        m_sqlWorkerThread.quit();
+        m_sqlWorkerThread.wait();
+        gLogger.log("Sql work thread quit!");
+    }
+
     delete ui;
     gLogger.log("Destroy MainWindow");
 }
@@ -65,9 +107,10 @@ void MainWindow::on_configButton_toggled(bool checked)
         }
         m_configButton->setText(tr("Close"));
         m_statusLabel->setText("<font face='Arial' size='5' color='green'>" + tr("Open") + "</font>");
-        m_workTimer->start(1000);
+        m_workTimer->start(TimeInterVal);
         setFunEnabled(true);
         gLogger.log("Open Serial Port");
+
     }
     else
     {
@@ -190,6 +233,11 @@ void MainWindow::sendCommand()
     readValue();
 }
 
+void MainWindow::showSqlDialog()
+{
+    m_pSqlDlg->show();
+}
+
 void MainWindow::readValue()
 {
     if(m_iMask & (1 << Channel_0))
@@ -291,7 +339,7 @@ void MainWindow::transmit(const QByteArray &cmd, DHexCmd::CommandType CmdType)
 {
     m_serialPort->write(cmd);
 
-    sleep(150);
+    sleep(300);
 
     QByteArray readBuf = m_serialPort->readAll();
 
@@ -301,16 +349,19 @@ void MainWindow::transmit(const QByteArray &cmd, DHexCmd::CommandType CmdType)
 void MainWindow::init()
 {
     this->setWindowTitle(tr("WaterQualityMonitor"));
-     m_workTimer = new QTimer(this);
+    m_workTimer = new QTimer(this);
     connect(m_workTimer, &QTimer::timeout, this, &MainWindow::sendCommand);
 
     m_serialPort = new QSerialPort(this);
+    m_pSqlDlg = new DSqlDialog(this);
 
     initUnitString();
     createWidget();
     updateSerialPortInfo();
 
-    gLogger.log("Construct the MainWindow instance");
+    initSqlWorker();
+    initMenuBar();
+    gLogger.log("Construct the MainWindow instance"); 
 }
 
 void MainWindow::initUnitString()
@@ -557,6 +608,15 @@ void MainWindow::initConnect()
     }
 
     connect(m_pAllCheckBox, &QCheckBox::stateChanged, this, &MainWindow::on_allCheckBox_stateChanged);
+
+}
+
+void MainWindow::initMenuBar()
+{
+    m_pMenu[CONFIG_MENU] = ui->menuBar->addMenu(tr("Config"));
+    m_pAction[SQLCONFIG_ACTION] = new QAction(tr("Sql Config"), this);
+    m_pMenu[CONFIG_MENU]->addAction(m_pAction[SQLCONFIG_ACTION]);
+    connect(m_pAction[SQLCONFIG_ACTION], SIGNAL(triggered()), this, SLOT(showSqlDialog()));
 }
 
 void MainWindow::configSerialPort()
@@ -681,6 +741,8 @@ void MainWindow::analysisChannel(QByteArray &bytes, DHexCmd::CommandType CmdType
         analysisData(4, bytes, CmdType);
         break;
     default:
+        m_serialPort->clear();
+        gLogger.log("analysisChannel: error");
         break;
     }
 }
@@ -697,6 +759,8 @@ void MainWindow::analysisData(int ch, QByteArray &bytes, DHexCmd::CommandType Cm
         analysisReadData(ch, bytes);
         break;
     default:
+        m_serialPort->clear();
+        gLogger.log("analysisData: error");
         break;
     }
 
@@ -765,6 +829,13 @@ void MainWindow::analysisReadData(int ch, QByteArray &bytes)
     m_pTempLabel[ch]->setText(QString("%1 ").arg(strT.toInt(&ok, 16)/10.0) + m_strUnit[UnitTemp]);
     ++m_readCount[ch];
     m_pReadCountLabel[ch]->setText(QString("Rx: %1").arg(m_readCount[ch]));
+    QString curTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    //for sql
+    if(gConfig.openDataLogger)
+    {
+        emit data(ch, hexFloat.dest, strT.toInt(&ok, 16)/10.0, curTime);
+    }
+
 }
 
 void MainWindow::analysisReadConst(int ch, QByteArray &bytes, DHexCmd::CommandType CmdType)
@@ -795,4 +866,16 @@ void MainWindow::setFunEnabled(bool enable)
     m_pReadTempConstBtn->setEnabled(enable);
     m_pWriteTempConstBtn->setEnabled(enable);
     m_pAllCheckBox->setEnabled(enable);
+}
+
+void MainWindow::initSqlWorker()
+{
+    m_pSqlWorker = new DSqlWorker;
+    m_pSqlWorker->moveToThread(&m_sqlWorkerThread);
+
+    connect(&m_sqlWorkerThread, SIGNAL(finished()), m_pSqlWorker, SLOT(deleteLater()));
+
+    connect(this, SIGNAL(data(int, const float, const float, const QString&)),
+            m_pSqlWorker, SLOT(updateSqlData(int, const float, const float, const QString&)));
+    m_sqlWorkerThread.start();
 }

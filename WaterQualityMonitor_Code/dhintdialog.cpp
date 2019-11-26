@@ -40,14 +40,13 @@ DHintDialog::DHintDialog(QWidget *parent) :
 
 DHintDialog::~DHintDialog()
 {
-    qDebug() << tr("~DHintDialog()");
+    qDebug() << "~DHintDialog()";
 }
 
 void DHintDialog::setInfo(QString strText)
 {
     m_pLbInfo->setText(strText);
 }
-
 
 void DHintDialog::getInstance(QString strText)
 {

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QThread>
 #include "dhexcmd.h"
 #include "dlogger.h"
 
@@ -17,12 +18,16 @@ class QTextEdit;
 class QGroupBox;
 class QCheckBox;
 class QLineEdit;
+class DSqlWorker;
+class DSqlDialog;
 
 union DHexFloat
 {
     int src;
     float dest;
 };
+
+const int TimeInterVal = 1000 * 2; //time interval
 
 class MainWindow : public QMainWindow
 {
@@ -57,11 +62,26 @@ class MainWindow : public QMainWindow
         Unit_Num
     };
 
+    enum ACTION_NAME
+    {
+        SQLCONFIG_ACTION = 0,
+        ACTION_NUM
+    };
+
+    enum MENU_NAME
+    {
+        CONFIG_MENU = 0,
+        MENU_NUM
+    };
+
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
     void sleep(unsigned int msec);
+
+signals:
+    void data(int, const float, const float, const QString&);
 
 protected slots:
     void on_configButton_toggled(bool checked);
@@ -77,6 +97,9 @@ protected slots:
     void on_writeTempConstBtn_clicked();
     void sendCommand();
 
+    //for sql
+    void showSqlDialog();
+
 private:
     void readValue();
     void saveConst();
@@ -90,7 +113,8 @@ private:
     void initWidget();   // 创建控件文字描述
     void initLayout();   // 创建布局
     void updateSerialPortInfo();
-     void initConnect();
+    void initConnect();
+    void initMenuBar();
 
     void configSerialPort();
     void setPortName(const QString& portName);
@@ -107,6 +131,10 @@ private:
     void analysisReadConst(int ch, QByteArray& bytes, DHexCmd::CommandType CmdType = DHexCmd::ReadValue);
 
     void setFunEnabled(bool enable);
+
+    //for sql
+    void initSqlWorker();
+
 private:
     Ui::MainWindow *ui;
     
@@ -151,6 +179,14 @@ private:
     int m_iMask;
     QString m_strUnit[Unit_Num];
 
+    //for menu
+    QAction *m_pAction[ACTION_NUM];
+    QMenu *m_pMenu[MENU_NUM];
+
+    //for sql
+    QThread m_sqlWorkerThread;
+    DSqlWorker *m_pSqlWorker;
+    DSqlDialog *m_pSqlDlg;
 };
 
 #endif // MAINWINDOW_H

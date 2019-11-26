@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-QT += serialport
+QT += serialport sql
 
 TARGET = WaterQualityMonitor
 TEMPLATE = app
@@ -40,7 +40,9 @@ SOURCES += \
     dhintdialog.cpp \
     dwarningdialog.cpp \
     ddialogtitle.cpp \
-    dlogger.cpp
+    dlogger.cpp \
+    dsqlworker.cpp \
+    dsqldialog.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -50,10 +52,13 @@ HEADERS += \
     dwarningdialog.h \
     ddialogtitle.h \
     dlogger.h \
-    config.h
+    config.h \
+    dsqlworker.h \
+    dsqldialog.h
 
 FORMS += \
         mainwindow.ui
 
 RESOURCES += \
     res.qrc
+
