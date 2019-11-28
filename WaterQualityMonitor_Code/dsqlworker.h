@@ -18,7 +18,6 @@ public slots:
     void updateSqlData(int chl, const float data, const float temp, const QString &strTime);
 
 private:
-    QMutex m_mutex;
     static const QString m_insertCommand[Channel_Num];
 };
 

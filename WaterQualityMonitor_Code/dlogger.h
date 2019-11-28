@@ -8,6 +8,7 @@
 
 extern std::mutex mt;
 
+//用于获取运行时间
 class Duration
 {
 public:
@@ -34,16 +35,19 @@ public:
         Log_Warning,
         Log_Error,
         Log_Fatal,
-        Log_Num
+        Level_Num
     };
 
 public:
     explicit DLogger(const std::string &dir = "");
 
-    void log(const char* msg, LogLevel level = Log_Info);
+    void log(const char* msg, const char* fileName, int line, LogLevel level = Log_Info);
 
 private:
     std::string m_fileName;
+    static const std::string m_levelMsg[Level_Num];
 };
+
+extern std::mutex mt;
 
 #endif // DLOGGER_H

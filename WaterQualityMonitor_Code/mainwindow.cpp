@@ -42,7 +42,7 @@ void MainRetriveConfigParam()
         config->deleteLater();
         config = Q_NULLPTR;
     }
-    gLogger.log("Retrive config param");
+    gLogger.log("Retrive config param", __FILE__, __LINE__);
 }
 
 void MainSaveConfigParam()
@@ -57,7 +57,7 @@ void MainSaveConfigParam()
         config->deleteLater();
         config = Q_NULLPTR;
     }
-    gLogger.log("Save config param");
+    gLogger.log("Save config param", __FILE__, __LINE__);
 }
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -69,6 +69,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     init();
 //    m_hexCmd.displayCommand();
+#if 0
+    QString curTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    for(int i = 0; i < 1000; ++i)
+    {
+//        qDebug() << "Main Thread: "<< QThread::currentThreadId();
+        emit data(i % 3, 18.2, 25.0, curTime);
+    }
+#endif
 }
 
 MainWindow::~MainWindow()
@@ -77,11 +85,11 @@ MainWindow::~MainWindow()
     {
         m_sqlWorkerThread.quit();
         m_sqlWorkerThread.wait();
-        gLogger.log("Sql work thread quit!");
+        gLogger.log("Sql work thread quit!", __FILE__, __LINE__);
     }
 
     delete ui;
-    gLogger.log("Destroy MainWindow");
+    gLogger.log("Destroy MainWindow", __FILE__, __LINE__);
 }
 
 void MainWindow::sleep(unsigned int msec)
@@ -93,7 +101,7 @@ void MainWindow::sleep(unsigned int msec)
     }
 }
 
-void MainWindow::on_configButton_toggled(bool checked)
+void MainWindow::onConfigbuttonToggled(bool checked)
 {
     if(checked)
     {
@@ -101,7 +109,7 @@ void MainWindow::on_configButton_toggled(bool checked)
         if(!m_serialPort->open(QIODevice::ReadWrite))
         {
             QMessageBox::warning(this, tr("Warning"), tr("Open Serial Port Failed!"));
-            gLogger.log("Open serial port failed", DLogger::Log_Error);
+            gLogger.log("Open serial port failed", __FILE__, __LINE__, DLogger::Log_Error);
             m_configButton->setChecked(false);
             return;
         }
@@ -109,7 +117,7 @@ void MainWindow::on_configButton_toggled(bool checked)
         m_statusLabel->setText("<font face='Arial' size='5' color='green'>" + tr("Open") + "</font>");
         m_workTimer->start(TimeInterVal);
         setFunEnabled(true);
-        gLogger.log("Open Serial Port");
+        gLogger.log("Open Serial Port", __FILE__, __LINE__);
 
     }
     else
@@ -124,11 +132,11 @@ void MainWindow::on_configButton_toggled(bool checked)
         m_statusLabel->setText("<font face='Arial' size='5' color='white'>" + tr("Close") + "</font>");
         m_workTimer->stop();
         setFunEnabled(false);
-        gLogger.log("Close Serial Port");
+        gLogger.log("Close Serial Port", __FILE__, __LINE__);
     }
 }
 
-void MainWindow::on_clearButton_clicked()
+void MainWindow::onClearbuttonClicked()
 {
     memset(m_readCount, 0, sizeof(m_readCount));
     for(int i = 0; i < Channel_Num; ++i)
@@ -139,7 +147,7 @@ void MainWindow::on_clearButton_clicked()
     m_pTempConstLineEdit->clear();
 }
 
-void MainWindow::on_updPortButton_clicked()
+void MainWindow::onUpdportbuttonClicked()
 {
     if(m_serialPort->isOpen())
     {
@@ -148,7 +156,7 @@ void MainWindow::on_updPortButton_clicked()
     updateSerialPortInfo();
 }
 
-void MainWindow::on_checkBox_stateChanged(int state)
+void MainWindow::onCheckboxStatechanged(int state)
 {
     Q_UNUSED(state);
     QCheckBox *checkBox = qobject_cast<QCheckBox*>(this->sender());
@@ -166,7 +174,7 @@ void MainWindow::on_checkBox_stateChanged(int state)
     }
 }
 
-void MainWindow::on_allCheckBox_stateChanged(int state)
+void MainWindow::onAllcheckboxStatechanged(int state)
 {
     Q_UNUSED(state);
     if(Qt::Checked == m_pAllCheckBox->checkState())
@@ -187,7 +195,7 @@ void MainWindow::on_allCheckBox_stateChanged(int state)
     }
 }
 
-void MainWindow::on_readConstBtn_clicked()
+void MainWindow::onReadconstbtnClicked()
 {
     if(0 != m_iMask)
     {
@@ -197,15 +205,15 @@ void MainWindow::on_readConstBtn_clicked()
     int iChl = m_pChannelComboBox->currentIndex();
     QByteArray command = m_hexCmd.command(DHexCmd::ReadConst, iChl);
     transmit(command, DHexCmd::ReadConst);
-    gLogger.log("Read electrode constant");
+    gLogger.log("Read electrode constant", __FILE__, __LINE__);
 }
 
-void MainWindow::on_writeConstBtn_clicked()
+void MainWindow::onWriteconstbtnClicked()
 {
     writeParameter(DHexCmd::WriteConst);
 }
 
-void MainWindow::on_readTempConstBtn_clicked()
+void MainWindow::onReadtempconstbtnClicked()
 {
     if(0 != m_iMask)
     {
@@ -216,10 +224,10 @@ void MainWindow::on_readTempConstBtn_clicked()
     QByteArray command = m_hexCmd.command(DHexCmd::ReadTempConst, iChl);
     transmit(command, DHexCmd::ReadTempConst);
 
-    gLogger.log("Read temperature compensation coefficient");
+    gLogger.log("Read temperature compensation coefficient", __FILE__, __LINE__);
 }
 
-void MainWindow::on_writeTempConstBtn_clicked()
+void MainWindow::onWritetempconstbtnClicked()
 {
      writeParameter(DHexCmd::WriteTempConst);
 }
@@ -324,10 +332,10 @@ void MainWindow::writeParameter(DHexCmd::CommandType cmdType)
     switch (cmdType)
     {
     case DHexCmd::WriteConst:
-        gLogger.log("Modified electrode constant");
+        gLogger.log("Modified electrode constant", __FILE__, __LINE__);
         break;
     case DHexCmd::WriteTempConst:
-        gLogger.log("Modified temperature compensation coefficient");
+        gLogger.log("Modified temperature compensation coefficient", __FILE__, __LINE__);
         break;
     default:
         break;
@@ -354,6 +362,7 @@ void MainWindow::init()
 
     m_serialPort = new QSerialPort(this);
     m_pSqlDlg = new DSqlDialog(this);
+    m_pSqlDlg->setObjectName("SqlDataDialog");
 
     initUnitString();
     createWidget();
@@ -361,7 +370,7 @@ void MainWindow::init()
 
     initSqlWorker();
     initMenuBar();
-    gLogger.log("Construct the MainWindow instance"); 
+    gLogger.log("Construct the MainWindow instance", __FILE__, __LINE__);
 }
 
 void MainWindow::initUnitString()
@@ -592,22 +601,22 @@ void MainWindow::updateSerialPortInfo()
 
 void MainWindow::initConnect()
 {
-    connect(m_configButton, SIGNAL(toggled(bool)), this, SLOT(on_configButton_toggled(bool)));
-    connect(m_clearButton, &QPushButton::clicked, this, &MainWindow::on_clearButton_clicked);
-    connect(m_updPortButton, &QPushButton::clicked, this, &MainWindow::on_updPortButton_clicked);
+    connect(m_configButton, SIGNAL(toggled(bool)), this, SLOT(onConfigbuttonToggled(bool)));
+    connect(m_clearButton, &QPushButton::clicked, this, &MainWindow::onClearbuttonClicked);
+    connect(m_updPortButton, &QPushButton::clicked, this, &MainWindow::onUpdportbuttonClicked);
 
-    connect(m_pReadConstBtn, &QPushButton::clicked, this, &MainWindow::on_readConstBtn_clicked);
-    connect(m_pWriteConstBtn, &QPushButton::clicked, this, &MainWindow::on_writeConstBtn_clicked);
+    connect(m_pReadConstBtn, &QPushButton::clicked, this, &MainWindow::onReadconstbtnClicked);
+    connect(m_pWriteConstBtn, &QPushButton::clicked, this, &MainWindow::onWriteconstbtnClicked);
 
-    connect(m_pReadTempConstBtn, &QPushButton::clicked, this, &MainWindow::on_readTempConstBtn_clicked);
-    connect(m_pWriteTempConstBtn, &QPushButton::clicked, this, &MainWindow::on_writeTempConstBtn_clicked);
+    connect(m_pReadTempConstBtn, &QPushButton::clicked, this, &MainWindow::onReadtempconstbtnClicked);
+    connect(m_pWriteTempConstBtn, &QPushButton::clicked, this, &MainWindow::onWritetempconstbtnClicked);
 
     for(int i = 0; i < Channel_Num; ++i)
     {
-        connect(m_pChannelCheckBox[i], &QCheckBox::stateChanged, this, &MainWindow::on_checkBox_stateChanged);
+        connect(m_pChannelCheckBox[i], &QCheckBox::stateChanged, this, &MainWindow::onCheckboxStatechanged);
     }
 
-    connect(m_pAllCheckBox, &QCheckBox::stateChanged, this, &MainWindow::on_allCheckBox_stateChanged);
+    connect(m_pAllCheckBox, &QCheckBox::stateChanged, this, &MainWindow::onAllcheckboxStatechanged);
 
 }
 
@@ -742,7 +751,7 @@ void MainWindow::analysisChannel(QByteArray &bytes, DHexCmd::CommandType CmdType
         break;
     default:
         m_serialPort->clear();
-        gLogger.log("analysisChannel: error");
+        gLogger.log("analysisChannel: error", __FILE__, __LINE__);
         break;
     }
 }
@@ -760,7 +769,7 @@ void MainWindow::analysisData(int ch, QByteArray &bytes, DHexCmd::CommandType Cm
         break;
     default:
         m_serialPort->clear();
-        gLogger.log("analysisData: error");
+        gLogger.log("analysisData: error", __FILE__, __LINE__);
         break;
     }
 
@@ -799,7 +808,7 @@ void MainWindow::analysisReadData(int ch, QByteArray &bytes)
     hexFloat.src = strR.toLong(&ok, 16)&0xFFFFFFFF;
     if(!ok)
     {
-        gLogger.log("String to long error", DLogger::Log_Error);
+        gLogger.log("String to long error", __FILE__, __LINE__, DLogger::Log_Error);
         return;
     }
 

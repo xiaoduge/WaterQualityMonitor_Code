@@ -48,7 +48,7 @@ void DHexCmd::init()
         QMessageBox::critical(nullptr,
                               QStringLiteral("Error"),
                               QStringLiteral("Open XML File failed!"));
-        gLogger.log("Failed to get command from xml file", DLogger::Log_Error);
+        gLogger.log("Failed to get command from xml file", __FILE__, __LINE__, DLogger::Log_Error);
     }
 
 }
@@ -58,7 +58,7 @@ bool DHexCmd::initFromXml(const QString &fileName)
     QFile file(fileName);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        gLogger.log("Failed to open Xml file");
+        gLogger.log("Failed to open Xml file", __FILE__, __LINE__);
         return false;
     }
 
@@ -76,12 +76,12 @@ bool DHexCmd::initFromXml(const QString &fileName)
     }
     if(xmlReader.hasError())
     {
-        gLogger.log("Xml has Error", DLogger::Log_Error);
+        gLogger.log("Xml has Error", __FILE__, __LINE__, DLogger::Log_Error);
         file.close();
         return false;
     }
     file.close();
-    gLogger.log("Successfully get commands from xml file");
+    gLogger.log("Successfully get commands from xml file", __FILE__, __LINE__);
     return true;
 }
 

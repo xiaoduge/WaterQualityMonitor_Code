@@ -3,9 +3,11 @@
 #include "dhintdialog.h"
 #include <QSqlDatabase>
 #include <QSqlQuery>
-#include <QMutexLocker>
 #include <QMessageBox>
 #include <QDebug>
+#include <QThread>
+
+QMutex gSqlMutex;
 
 const QString DSqlWorker::m_insertCommand[Channel_Num] =
 {
@@ -26,7 +28,7 @@ DSqlWorker::~DSqlWorker()
 
 void DSqlWorker::updateSqlData(int chl, const float data, const float temp,const QString &strTime)
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    QMutexLocker mutexLocker(&gSqlMutex);
     QSqlQuery query;
     query.prepare(m_insertCommand[chl]);
     query.bindValue(":data_R", data);
@@ -36,7 +38,8 @@ void DSqlWorker::updateSqlData(int chl, const float data, const float temp,const
     bool ret = query.exec();
     if(!ret)
     {
-        gLogger.log("Insert to database failed", DLogger::Log_Warning);
+        gLogger.log("Insert to database failed", __FILE__, __LINE__, DLogger::Log_Warning);
     }
+//    qDebug() << "Sql Thread: "<< QThread::currentThreadId();
 }
 

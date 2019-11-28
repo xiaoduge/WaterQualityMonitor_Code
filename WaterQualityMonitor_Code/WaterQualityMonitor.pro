@@ -20,7 +20,7 @@ TEMPLATE = app
 DEFINES += QT_DEPRECATED_WARNINGS
 
 #Disable debug when relase
-Release:DEFINES += QT_NO_DEBUG_OUTPUT
+#Release:DEFINES += QT_NO_DEBUG_OUTPUT
 
 RC_ICONS = app.ico
 

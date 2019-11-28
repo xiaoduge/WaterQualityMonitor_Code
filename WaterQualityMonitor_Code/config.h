@@ -2,7 +2,7 @@
 #define CONFIG_H
 
 #include "dlogger.h"
-
+#include <QMutexLocker>
 
 struct GlobalConfiguration
 {
@@ -19,7 +19,7 @@ enum Channel
 
 extern DLogger gLogger;
 extern GlobalConfiguration gConfig;
-
+extern QMutex gSqlMutex;
 
 void MainRetriveConfigParam();
 void MainSaveConfigParam();

@@ -31,6 +31,7 @@ private:
     void initSqlTableModel();
     void initConnect();
     void buildTranslation();
+    void initTabelHeaderData(QSqlTableModel *tableModel);
 
 protected:
     void showEvent(QShowEvent *event);

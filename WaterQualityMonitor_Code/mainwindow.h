@@ -84,17 +84,17 @@ signals:
     void data(int, const float, const float, const QString&);
 
 protected slots:
-    void on_configButton_toggled(bool checked);
-    void on_clearButton_clicked();
-    void on_updPortButton_clicked();
+    void onConfigbuttonToggled(bool checked);
+    void onClearbuttonClicked();
+    void onUpdportbuttonClicked();
 
-    void on_checkBox_stateChanged(int state);
-    void on_allCheckBox_stateChanged(int state);
+    void onCheckboxStatechanged(int state);
+    void onAllcheckboxStatechanged(int state);
 
-    void on_readConstBtn_clicked();
-    void on_writeConstBtn_clicked();
-    void on_readTempConstBtn_clicked();
-    void on_writeTempConstBtn_clicked();
+    void onReadconstbtnClicked();
+    void onWriteconstbtnClicked();
+    void onReadtempconstbtnClicked();
+    void onWritetempconstbtnClicked();
     void sendCommand();
 
     //for sql

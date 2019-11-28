@@ -21,12 +21,12 @@ void initSql()
 
     if(db.open())
     {
-        gLogger.log("Database initialized successfully");
+        gLogger.log("Database initialized successfully", __FILE__, __LINE__);
     }
     else
     {
         DHintDialog::getInstance(QObject::tr("Init Database Failed"));
-        gLogger.log("Failed to open database", DLogger::Log_Warning);
+        gLogger.log("Failed to open database", __FILE__, __LINE__, DLogger::Log_Warning);
         return;
     }
 
@@ -45,70 +45,35 @@ void initSql()
                                                                        "data_T REAL NOT NULL,"
                                                                        "time VARCHAR(20) NOT NULL)";
 
-#if 0
-//    qDebug() << QSqlDatabase::drivers();
-    QSqlDatabase db= QSqlDatabase::addDatabase("QMYSQL");
-    QTextCodec::setCodecForLocale(QTextCodec::codecForLocale());
-    db.setHostName("192.168.0.81");
-    db.setDatabaseName("waterqualitydata");
-    db.setUserName("root");
-    db.setPassword("sa");
-    if(db.open())
-    {
-        gLogger.log("Database initialized successfully");
-    }
-    else
-    {
-        DHintDialog::getInstance(QObject::tr("Init Database Failed"));
-        gLogger.log("Failed to open database", DLogger::Log_Warning);
-        return;
-    }
-
-    QString CREATE_TABLE_CHL1 = "CREATE TABLE IF NOT EXISTS  Chl1_Data(id INTEGER PRIMARY KEY auto_increment,"
-                                                                       "data_R REAL NOT NULL,"
-                                                                       "data_T REAL NOT NULL,"
-                                                                       "time VARCHAR(20) NOT NULL)";
-
-    QString CREATE_TABLE_CHL2 = "CREATE TABLE IF NOT EXISTS  Chl2_Data(id INTEGER PRIMARY KEY auto_increment,"
-                                                                       "data_R REAL NOT NULL,"
-                                                                       "data_T REAL NOT NULL,"
-                                                                       "time VARCHAR(20) NOT NULL)";
-
-    QString CREATE_TABLE_CHL3 = "CREATE TABLE IF NOT EXISTS  Chl3_Data(id INTEGER PRIMARY KEY auto_increment,"
-                                                                       "data_R REAL NOT NULL,"
-                                                                       "data_T REAL NOT NULL,"
-                                                                       "time VARCHAR(20) NOT NULL)";
-
-#endif
     QSqlQuery query;
     bool success = query.exec(CREATE_TABLE_CHL1);
     if(success)
     {
-        gLogger.log("Sql:First channel data table created successfully", DLogger::Log_Info);
+        gLogger.log("Sql:First channel data table created successfully", __FILE__, __LINE__, DLogger::Log_Info);
     }
     else
     {
-        gLogger.log("Sql:Failed to create first channel data table", DLogger::Log_Warning);
+        gLogger.log("Sql:Failed to create first channel data table", __FILE__, __LINE__, DLogger::Log_Warning);
     }
 
     success = query.exec(CREATE_TABLE_CHL2);
     if(success)
     {
-        gLogger.log("Sql:Second channel data table created successfully", DLogger::Log_Info);
+        gLogger.log("Sql:Second channel data table created successfully", __FILE__, __LINE__, DLogger::Log_Info);
     }
     else
     {
-        gLogger.log("Sql:Failed to create second channel data table", DLogger::Log_Warning);
+        gLogger.log("Sql:Failed to create second channel data table", __FILE__, __LINE__, DLogger::Log_Warning);
     }
 
     success = query.exec(CREATE_TABLE_CHL3);
     if(success)
     {
-        gLogger.log("Sql:Third channel data table created successfully", DLogger::Log_Info);
+        gLogger.log("Sql:Third channel data table created successfully", __FILE__, __LINE__, DLogger::Log_Info);
     }
     else
     {
-        gLogger.log("Sql:Failed to create third channel data table", DLogger::Log_Warning);
+        gLogger.log("Sql:Failed to create third channel data table", __FILE__, __LINE__, DLogger::Log_Warning);
     }
 }
 
@@ -117,19 +82,18 @@ void loadTheme(QApplication &app)
     QFile qssFile(":/qss/app.qss");
     if(!qssFile.open(QFile::ReadOnly))
     {
-        gLogger.log("Loading theme failed", DLogger::Log_Error);
+        gLogger.log("Loading theme failed", __FILE__, __LINE__, DLogger::Log_Error);
     }
 
     QString strQss = qssFile.readAll();
     qssFile.close();
     app.setStyleSheet(strQss);
-    gLogger.log("Successfully loaded theme");
+    gLogger.log("Successfully loaded theme", __FILE__, __LINE__);
 }
 
 bool createLogDir(const QString& fullPath)
 {
     QString strDir = QDir::currentPath() + "/" + fullPath;
-    qDebug() << strDir;
     QDir dir(strDir);
     if(dir.exists())
     {
@@ -158,11 +122,11 @@ int main(int argc, char *argv[])
     if(trans.load(":/language/cn.qm"))
     {
         a.installTranslator(&trans);
-        gLogger.log("Successfully loaded language file");
+        gLogger.log("Successfully loaded language file", __FILE__, __LINE__);
     }
     else
     {
-        gLogger.log("Failed to load language file");
+        gLogger.log("Failed to load language file", __FILE__, __LINE__);
     }
     MainWindow w;
     w.setObjectName("MainWindow");
