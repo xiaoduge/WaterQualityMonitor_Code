@@ -74,11 +74,12 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     init();
+
 //    m_hexCmd.displayCommand();
 }
 
 /**
- * 析构函数注释
+ * 析构函数中结束子线程，并等待子线程结束。
  */
 MainWindow::~MainWindow()
 {
