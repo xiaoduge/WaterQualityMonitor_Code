@@ -69,14 +69,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     init();
 //    m_hexCmd.displayCommand();
-#if 0
-    QString curTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-    for(int i = 0; i < 1000; ++i)
-    {
-//        qDebug() << "Main Thread: "<< QThread::currentThreadId();
-        emit data(i % 3, 18.2, 25.0, curTime);
-    }
-#endif
 }
 
 MainWindow::~MainWindow()
