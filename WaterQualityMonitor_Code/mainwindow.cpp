@@ -77,6 +77,9 @@ MainWindow::MainWindow(QWidget *parent) :
 //    m_hexCmd.displayCommand();
 }
 
+/**
+ * 析构函数注释
+ */
 MainWindow::~MainWindow()
 {
     if(m_sqlWorkerThread.isRunning())
