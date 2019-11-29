@@ -10,6 +10,9 @@
 #include <QDebug>
 #include "dhintdialog.h"
 
+/**
+ * 初始化数据库
+ */
 void initSql()
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
