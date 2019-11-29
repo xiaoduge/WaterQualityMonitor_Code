@@ -30,6 +30,9 @@
 DLogger gLogger("Log");
 GlobalConfiguration gConfig;
 
+/**
+ * 读取配置文件，在构造MainWindow之前调用
+ */
 void MainRetriveConfigParam()
 {
     QSettings *config = new QSettings(QStringLiteral("config.ini"), QSettings::IniFormat);
@@ -45,6 +48,9 @@ void MainRetriveConfigParam()
     gLogger.log("Retrive config param", __FILE__, __LINE__);
 }
 
+/**
+ * 保存配置信息
+ */
 void MainSaveConfigParam()
 {
     QSettings *config = new QSettings(QStringLiteral("config.ini"), QSettings::IniFormat);
