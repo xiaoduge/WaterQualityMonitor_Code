@@ -74,7 +74,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     init();
-//    m_hexCmd.displayCommand();
+//    m_hexCmd.displayCommand(); branch
 #if 0
     QString curTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
     for(int i = 0; i < 1000; ++i)
@@ -85,6 +85,9 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
 }
 
+/**
+ * 析构函数中结束子线程，并等待子线程结束。
+ */
 MainWindow::~MainWindow()
 {
     if(m_sqlWorkerThread.isRunning())
