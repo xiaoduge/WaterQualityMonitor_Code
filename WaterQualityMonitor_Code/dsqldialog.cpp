@@ -178,5 +178,5 @@ void DSqlDialog::on_sqlCheck_stateChanged(int state)
     {
         gConfig.openDataLogger = false;
     }
-    MainSaveConfigParam();
+    MainSaveConfigParam(SaveSqlCfg);
 }

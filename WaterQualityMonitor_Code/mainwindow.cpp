@@ -26,9 +26,13 @@
 #include "config.h"
 #include <QSettings>
 #include <QAction>
+#include "dfactorcfgdialog.h"
+#include "dtempsimulatedialog.h"
 
 DLogger gLogger("Log");
 GlobalConfiguration gConfig;
+Factor gFactor;
+float gSimTemp;
 
 /**
  * 读取配置文件，在构造MainWindow之前调用
@@ -37,8 +41,17 @@ void MainRetriveConfigParam()
 {
     QSettings *config = new QSettings(QStringLiteral("config.ini"), QSettings::IniFormat);
 
-    QString strV = "/OpenSqlDataLogger/";
+    QString strV = "SqlConfig/OpenSqlDataLogger/";
     gConfig.openDataLogger = config->value(strV, false).toBool();
+
+    strV = "Factor/FirstFactor/";
+    gFactor.firstFactor = config->value(strV, 0.02).toFloat();
+
+    strV = "Factor/SecondFactor/";
+    gFactor.secondFactor = config->value(strV, 0.02).toFloat();
+
+    strV = "SimulationConfig/temperatureSim/";
+    gConfig.enableTempSlm = config->value(strV, false).toBool();
 
     if (config)
     {
@@ -51,12 +64,35 @@ void MainRetriveConfigParam()
 /**
  * 保存配置信息
  */
-void MainSaveConfigParam()
+void MainSaveConfigParam(SaveParamType type)
 {
     QSettings *config = new QSettings(QStringLiteral("config.ini"), QSettings::IniFormat);
 
-    QString strV = "/OpenSqlDataLogger/";
-    config->setValue(strV, gConfig.openDataLogger);
+    switch(type)
+    {
+    case SaveSqlCfg:
+    {
+        QString strV = "SqlConfig/OpenSqlDataLogger/";
+        config->setValue(strV, gConfig.openDataLogger);
+        break;
+    }
+    case SaveFactorCfg:
+    {
+        QString strV = "Factor/FirstFactor/";
+        config->setValue(strV, gFactor.firstFactor);
+        strV = "Factor/SecondFactor/";
+        config->setValue(strV, gFactor.secondFactor);
+        break;
+    }
+    case SaveTempSimCfg:
+    {
+        QString strV = "SimulationConfig/temperatureSim/";
+        config->setValue(strV, gConfig.enableTempSlm);
+        break;
+    }
+    default:
+        break;
+    }
 
     if (config)
     {
@@ -244,6 +280,20 @@ void MainWindow::sendCommand()
 void MainWindow::showSqlDialog()
 {
     m_pSqlDlg->show();
+}
+
+void MainWindow::showFactorCfgDialog()
+{
+    DFactorCfgDialog factorDialog;
+    factorDialog.setObjectName("factorDialog");
+    factorDialog.exec();
+}
+
+void MainWindow::showTempSimDialog()
+{
+    DTempSimulateDialog tSimDlg;
+    tSimDlg.setObjectName("tempSimDialog");
+    tSimDlg.exec();
 }
 
 void MainWindow::readValue()
@@ -624,8 +674,21 @@ void MainWindow::initMenuBar()
 {
     m_pMenu[CONFIG_MENU] = ui->menuBar->addMenu(tr("Config"));
     m_pAction[SQLCONFIG_ACTION] = new QAction(tr("Sql Config"), this);
-    m_pMenu[CONFIG_MENU]->addAction(m_pAction[SQLCONFIG_ACTION]);
     connect(m_pAction[SQLCONFIG_ACTION], SIGNAL(triggered()), this, SLOT(showSqlDialog()));
+
+    m_pAction[FACTORCFG_ACTION] = new QAction(tr("Factor Config"), this);
+    connect(m_pAction[FACTORCFG_ACTION], SIGNAL(triggered()), this, SLOT(showFactorCfgDialog()));
+
+    m_pAction[SIMTEMP_ACTION] = new QAction(tr("Temp Simulation"), this);
+    connect(m_pAction[SIMTEMP_ACTION], SIGNAL(triggered()), this, SLOT(showTempSimDialog()));
+
+    QList<QAction*> actionsList;
+    for(int i = 0; i < ACTION_NUM; ++i)
+    {
+        actionsList << m_pAction[i];
+    }
+
+    m_pMenu[CONFIG_MENU]->addActions(actionsList);
 }
 
 void MainWindow::configSerialPort()
@@ -812,34 +875,55 @@ void MainWindow::analysisReadData(int ch, QByteArray &bytes)
         return;
     }
 
+    float fRx = hexFloat.dest;
+    float fTx = strT.toInt(&ok, 16)/10.0;
+
+    if(gConfig.enableTempSlm)
+    {
+        fTx = gSimTemp;
+    }
+
+    switch (ch)
+    {
+    case 0:
+        fRx = reCalcRx(0, fRx, strT.toInt(&ok, 16)/10.0);
+        break;
+    case 1:
+        fRx = reCalcRx(1, fRx, strT.toInt(&ok, 16)/10.0);
+        break;
+    default:
+        break;
+    }
+
     if(ch < 2)
     {
-        if(hexFloat.dest < 1.0)
+        if(fRx < 1.0)
         {
-            m_pQualityLabel[ch]->setText(QString("%1 ").arg(hexFloat.dest, 0, 'f', 3) + m_strUnit[UnitCond]);
+            m_pQualityLabel[ch]->setText(QString("%1 ").arg(fRx, 0, 'f', 3) + m_strUnit[UnitCond]);
         }
         else
         {
-            m_pQualityLabel[ch]->setText(QString("%1 ").arg(hexFloat.dest, 0, 'f', 1) + m_strUnit[UnitCond]);
+            m_pQualityLabel[ch]->setText(QString("%1 ").arg(fRx, 0, 'f', 1) + m_strUnit[UnitCond]);
         }
 
     }
     else
     {
-        if(hexFloat.dest < 1.0)
+        if(fRx < 1.0)
         {
-            m_pQualityLabel[ch]->setText(QString("%1 ").arg(hexFloat.dest, 0, 'f', 3) + m_strUnit[UnitRes]);
+            m_pQualityLabel[ch]->setText(QString("%1 ").arg(fRx, 0, 'f', 3) + m_strUnit[UnitRes]);
         }
         else
         {
-            m_pQualityLabel[ch]->setText(QString("%1 ").arg(hexFloat.dest, 0, 'f', 1) + m_strUnit[UnitRes]);
+            m_pQualityLabel[ch]->setText(QString("%1 ").arg(fRx, 0, 'f', 1) + m_strUnit[UnitRes]);
         }
     }
-    m_pTempLabel[ch]->setText(QString("%1 ").arg(strT.toInt(&ok, 16)/10.0) + m_strUnit[UnitTemp]);
+    m_pTempLabel[ch]->setText(QString("%1 ").arg(fTx) + m_strUnit[UnitTemp]);
     ++m_readCount[ch];
     m_pReadCountLabel[ch]->setText(QString("Rx: %1").arg(m_readCount[ch]));
-    QString curTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+
     //for sql
+    QString curTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
     if(gConfig.openDataLogger)
     {
         emit data(ch, hexFloat.dest, strT.toInt(&ok, 16)/10.0, curTime);
@@ -887,4 +971,24 @@ void MainWindow::initSqlWorker()
     connect(this, SIGNAL(data(int, const float, const float, const QString&)),
             m_pSqlWorker, SLOT(updateSqlData(int, const float, const float, const QString&)));
     m_sqlWorkerThread.start();
+}
+
+float MainWindow::reCalcRx(int iChl, float fValue, float tx)
+{
+    float value = fValue * (1+0.02*(tx-25));
+
+    if(gConfig.enableTempSlm)
+    {
+        tx = gSimTemp;
+    }
+
+    switch(iChl)
+    {
+    case 0:
+        return value/(1 + gFactor.firstFactor * (tx-25));
+    case 1:
+        return value/(1 + gFactor.secondFactor * (tx-25));
+    default:
+        return fValue;
+    }
 }

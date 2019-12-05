@@ -7,6 +7,13 @@
 struct GlobalConfiguration
 {
     bool openDataLogger;
+    bool enableTempSlm;
+};
+
+struct Factor
+{
+    float firstFactor;
+    float secondFactor;
 };
 
 enum Channel
@@ -17,11 +24,20 @@ enum Channel
     Channel_Num
 };
 
+enum SaveParamType
+{
+    SaveSqlCfg = 0,
+    SaveFactorCfg,
+    SaveTempSimCfg
+};
+
 extern DLogger gLogger;
 extern GlobalConfiguration gConfig;
 extern QMutex gSqlMutex;
+extern Factor gFactor;
+extern float gSimTemp;
 
 void MainRetriveConfigParam();
-void MainSaveConfigParam();
+void MainSaveConfigParam(SaveParamType type);
 
 #endif // CONFIG_H

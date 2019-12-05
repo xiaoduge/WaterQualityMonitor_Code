@@ -65,6 +65,8 @@ class MainWindow : public QMainWindow
     enum ACTION_NAME
     {
         SQLCONFIG_ACTION = 0,
+        FACTORCFG_ACTION,
+        SIMTEMP_ACTION,
         ACTION_NUM
     };
 
@@ -99,6 +101,9 @@ protected slots:
 
     //for sql
     void showSqlDialog();
+
+    void showFactorCfgDialog();
+    void showTempSimDialog();
 
 private:
     void readValue();
@@ -135,6 +140,7 @@ private:
     //for sql
     void initSqlWorker();
 
+    float reCalcRx(int iChl, float fValue, float tx);
 private:
     Ui::MainWindow *ui;
     

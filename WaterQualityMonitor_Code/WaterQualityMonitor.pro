@@ -42,7 +42,9 @@ SOURCES += \
     ddialogtitle.cpp \
     dlogger.cpp \
     dsqlworker.cpp \
-    dsqldialog.cpp
+    dsqldialog.cpp \
+    dfactorcfgdialog.cpp \
+    dtempsimulatedialog.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -54,10 +56,14 @@ HEADERS += \
     dlogger.h \
     config.h \
     dsqlworker.h \
-    dsqldialog.h
+    dsqldialog.h \
+    dfactorcfgdialog.h \
+    dtempsimulatedialog.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    dfactorcfgdialog.ui \
+    dtempsimulatedialog.ui
 
 RESOURCES += \
     res.qrc

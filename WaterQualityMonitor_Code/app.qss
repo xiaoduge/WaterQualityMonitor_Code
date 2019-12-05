@@ -29,7 +29,7 @@ QMenu:item:selected
     color: #969696;
 }
 
-QDialog#SqlDataDialog
+QDialog#SqlDataDialog, #factorDialog, #tempSimDialog
 {
     background-color: #031E41;
 }
